@@ -1,0 +1,30 @@
+{
+    "name": "laracombs/table",
+    "require": {
+        "php": "~8.1.0|~8.2.0|~8.3.0",
+        "ext-json": "*",
+        "illuminate/support": "^10.34|^11.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^2.9"
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "LaraCombs\\Table\\Providers\\TablesServiceProvider"
+            ]
+        }
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "LaraCombs\\Table\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Norman Huth",
+            "homepage": "https://huth.it"
+        }
+    ]
+}

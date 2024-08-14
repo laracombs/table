@@ -1,0 +1,81 @@
+<?php
+
+namespace {{ namespace }};
+
+use Illuminate\Http\Request;
+use LaraCombs\Table\AbstractTable;
+
+class {{ class }} extends AbstractTable
+{
+    /**
+     * The resource model for the table.
+     *
+     * @return class-string<\Illuminate\Database\Eloquent\Model>
+     */
+    public function model(): string
+    {
+        {{ resourceModel }}
+    }
+
+    /**
+     * Get the table columns for the given resource.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return array<\Laracombs\Table\AbstractColumn>
+     */
+    public function columns(Request $request): array
+    {
+        // TODO: Implement columns() method.
+    }
+
+    /**
+     * Get the columns that should be searched.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return array<int, string>
+     */
+    public function search(Request $request): array
+    {
+        return [];
+    }
+
+    /**
+     * Get all available actions for this table.
+     *
+     * @return array<\LaraCombs\Table\AbstractAction>
+     */
+    public function filters(Request $request): array
+    {
+        return [];
+    }
+
+    /**
+     * Get all available actions for this table.
+     *
+     * @return array<\LaraCombs\Table\AbstractAction>
+     */
+    public function actions(Request $request): array
+    {
+        return [];
+    }
+
+    /**
+     * Get all available standalone actions for this table.
+     *
+     * @return array<\LaraCombs\Table\AbstractAction>
+     */
+    public function standaloneActions(Request $request): array
+    {
+        return [];
+    }
+
+    /**
+     * Get all available filters for this table.
+     *
+     * @return array<\LaraCombs\Table\AbstractAction>
+     */
+    public function filters(Request $request): array
+    {
+        return [];
+    }
+}
