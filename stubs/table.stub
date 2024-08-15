@@ -68,14 +68,4 @@ class {{ class }} extends AbstractTable
     {
         return [];
     }
-
-    /**
-     * Get all available filters for this table.
-     *
-     * @return array<\LaraCombs\Table\AbstractAction>
-     */
-    public function filters(Request $request): array
-    {
-        return [];
-    }
 }

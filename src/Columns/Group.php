@@ -33,6 +33,7 @@ class Group extends AbstractColumn
     /**
      * Set the array of items.
      *
+     * @param  array<\LaraCombs\Table\AbstractElement>  $items
      * @return $this
      */
     public function items(array $items): static
@@ -54,9 +55,15 @@ class Group extends AbstractColumn
 
     /**
      * Resolve the column value for display.
+     *
+     * @return array<\LaraCombs\Table\AbstractElement>
      */
     protected function resolveValue(Request $request): array
     {
-        return $this->items;
+        // @phpstan-ignore-next-line
+        return collect($this->items)
+            ->map(fn (AbstractElement $item) => $item->forResource($this->resource))
+            ->filter(fn (AbstractElement $item) => $item->authorize($request))
+            ->toArray();
     }
 }

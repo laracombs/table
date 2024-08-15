@@ -5,6 +5,7 @@ namespace LaraCombs\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
@@ -12,6 +13,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 
+/**
+ * @template TKey of array-key
+ */
 abstract class AbstractTable implements JsonSerializable
 {
     use Macroable;
@@ -29,16 +33,25 @@ abstract class AbstractTable implements JsonSerializable
     /**
      * The Collection of authorized table columns.
      *
-     * @var \Illuminate\Support\Collection<\LaraCombs\Table\AbstractColumn>
+     * @var \Illuminate\Support\Collection<int, \LaraCombs\Table\AbstractColumn>
      */
     protected Collection $columns;
 
     /**
      * The array of table headings.
      *
-     * @var array<string, string>
+     * @var array<TKey, mixed>
      */
     protected array $headings;
+
+    /**
+     * The Class and Style Bindings.
+     *
+     * @var array<string, array<int, string>>
+     */
+    protected array $bindings = [
+        'classes' => ['table'],
+    ];
 
     /**
      * The resource model for the given table.
@@ -50,7 +63,7 @@ abstract class AbstractTable implements JsonSerializable
     /**
      * Get the table columns for the given resource.
      *
-     * @return array<\LaraCombs\Table\AbstractColumn>
+     * @return array<int, \LaraCombs\Table\AbstractColumn>
      */
     abstract public function columns(Request $request): array;
 
@@ -149,8 +162,10 @@ abstract class AbstractTable implements JsonSerializable
             });
         }
 
+        $perPage = $request->integer($this->uriKey . '_per_page');
+
         $instance = $instance->paginate(
-            $request->input($this->uriKey . '_per_page') ?? $this->perPageOptions($request)[0],
+            $perPage && $perPage > 0 ? $perPage : $this->perPageOptions($request)[0],
             ['*'],
             $this->uriKey . '_page'
         );
@@ -170,8 +185,11 @@ abstract class AbstractTable implements JsonSerializable
 
     /**
      * Run a map over each of the Model resources.
+     *
+     * @param  \Illuminate\Pagination\AbstractPaginator<\Illuminate\Support\Collection>  $resources
+     * @return \Illuminate\Pagination\AbstractPaginator
      */
-    protected function mapResourcesCollection(LengthAwarePaginator $resources): LengthAwarePaginator
+    protected function mapResourcesCollection(AbstractPaginator $resources): AbstractPaginator
     {
         $collection = $resources->getCollection()
             ->map(fn (Model $resource) => $this->mapModelResource($resource));
@@ -181,6 +199,9 @@ abstract class AbstractTable implements JsonSerializable
 
     /**
      * Map Model resource with table columns.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $resource
+     * @return array<int, array<string, mixed>>.
      */
     protected function mapModelResource(Model $resource): array
     {
@@ -208,23 +229,42 @@ abstract class AbstractTable implements JsonSerializable
      */
     protected function setHeadings(): void
     {
-        $this->headings = $this->columns
-            ->mapWithKeys(fn (AbstractColumn $column) => [$column->attribute => $column->name])
+        $columns = $this->columns
+            ->map(fn (AbstractColumn $column) => [
+                'attribute' => $column->attribute,
+                'name' => $column->name,
+                'classes' => data_get($column->bindings, 'headingClasses', []),
+                'styles' => data_get($column->bindings, 'headingStyles', []),
+            ])
             ->toArray();
+
+        $this->headings = $columns;
     }
 
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return array<\LaraCombs\Table\AbstractAction>
+     */
     protected function resolveActions(Request $request): array
     {
         // @Todo: implement
         return [];
     }
 
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return array<\LaraCombs\Table\AbstractAction>
+     */
     protected function resolveStandaloneActions(Request $request): array
     {
         // @Todo: implement
         return [];
     }
 
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return array<\LaraCombs\Table\AbstractFilter>
+     */
     protected function resolveFilters(Request $request): array
     {
         // @Todo: implement
@@ -234,13 +274,15 @@ abstract class AbstractTable implements JsonSerializable
     /**
      * Determine the debounce amount in seconds for this table.
      */
-    public function debounce(Request $request): int
+    public function debounce(Request $request): int|float
     {
         if ($this->debounce > 0) {
             return $this->debounce;
         }
 
-        return config('laracombs-table.search_debounce', 0.5);
+        $debounce = config('laracombs-table.search_debounce', 0.5);
+
+        return is_float($debounce) || is_int($debounce) ? $debounce : 0.5;
     }
 
     /**
@@ -267,6 +309,7 @@ abstract class AbstractTable implements JsonSerializable
             'filters' => $this->resolveFilters($request),
             'hasActions' => count($actions) > 0 || count($standaloneActions) > 0,
             'debounce' => $this->debounce($request),
+            'bindings' => $this->bindings,
         ]);
     }
 }

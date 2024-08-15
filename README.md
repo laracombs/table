@@ -45,6 +45,6 @@ wip
 ## Contribution Target
 
 - Clean and solid code
-  - PHP: [PSR-12](https://www.php-fig.org/psr/psr-12/)
+  - PHP: [PSR-12](https://www.php-fig.org/psr/psr-12/) / Laravel Mixed
   - JavaScript: [ESLint](https://eslint.org/)
 - No error results with [PHPStan](https://phpstan.org/)

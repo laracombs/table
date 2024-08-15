@@ -2,19 +2,23 @@
 
 namespace LaraCombs\Table;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use LaraCombs\Table\Traits\AuthorizationTrait;
+use LaraCombs\Table\Traits\HasClassAndStyleBindingTrait;
 use LaraCombs\Table\Traits\HasComponentTrait;
+use LaraCombs\Table\Traits\HasResourceTrait;
 use LaraCombs\Table\Traits\MakeableTrait;
 
 /** @phpstan-consistent-constructor */
 abstract class AbstractColumn implements JsonSerializable
 {
     use AuthorizationTrait;
+    use HasClassAndStyleBindingTrait;
     use HasComponentTrait;
+    use HasResourceTrait;
     use Macroable;
     use MakeableTrait;
 
@@ -24,12 +28,9 @@ abstract class AbstractColumn implements JsonSerializable
     protected string $type = 'Column';
 
     /**
-     * The resource associated with the column.
-     */
-    public Model $resource;
-
-    /**
      * The name displayed in heading of a table.
+     *
+     * @var string
      */
     public string $name;
 
@@ -44,6 +45,13 @@ abstract class AbstractColumn implements JsonSerializable
     public string $attribute;
 
     /**
+     * Optional merged data for more flexible columns
+     *
+     * @var mixed|array
+     */
+    protected mixed $mergedData = [];
+
+    /**
      * The callback to be used to resolve the field's value.
      *
      * @var (callable(mixed, mixed, ?string):(mixed))|null
@@ -51,24 +59,10 @@ abstract class AbstractColumn implements JsonSerializable
     public mixed $resolveAttributeCallback;
 
     /**
-     * The array of classes for Class binding for the Table TD element.
-     *
-     * @todo Default not hardcoded.
-     *
-     * @var array<int, string>
-     */
-    public ?array $tdClasses = ['tc-table-td'];
-
-    /**
-     * The array of Style attributes for class binding for the Table TD element.
-     *
-     * @var array<int, string>
-     */
-    public ?array $tdStyles = [];
-
-    /**
      * Create a new column element.
      *
+     * @param  string  $name
+     * @param  string  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveAttributeCallback
      */
     public function __construct(string $name, string $attribute, ?callable $resolveAttributeCallback = null)
@@ -76,11 +70,35 @@ abstract class AbstractColumn implements JsonSerializable
         $this->name = $name;
         $this->attribute = $attribute;
         $this->resolveAttributeCallback = $resolveAttributeCallback;
+
+        $this->bindings['headingClasses'] = [];
+        $this->bindings['headingStyles'] = [];
     }
 
-    public function forResource(Model $resource): static
+
+
+    /**
+     * Add Class binding.
+     *
+     * @param  array<string>|string  $class
+     * @return static
+     */
+    public function headingClass(array|string $class): static
     {
-        $this->resource = $resource;
+        $this->bindings['headingClasses'] = array_unique(array_merge($this->bindings['headingClasses'], (array) $class));
+
+        return $this;
+    }
+
+    /**
+     * Add Style binding.
+     *
+     * @param  array<string>|string  $class
+     * @return static
+     */
+    public function headingStyle(array|string $class): static
+    {
+        $this->bindings['headingStyles'] = array_unique(array_merge($this->bindings['headingStyles'], (array) $class));
 
         return $this;
     }
@@ -114,47 +132,7 @@ abstract class AbstractColumn implements JsonSerializable
             call_user_func($this->resolveAttributeCallback, $this->resource, $request) :
             value(data_get($this->resource, $this->attribute));
 
-        return ! is_bool($value) && ! is_int($value) && empty($value) ? $this->resolveDefaultValue() : $value;
-    }
-
-    /**
-     * Set the array of Classes for Class binding for the Table TD element.
-     */
-    public function setTdClasses(array|string $classes): static
-    {
-        $this->tdClasses = (array) $classes;
-
-        return $this;
-    }
-
-    /**
-     * Extend the array of Classes for Class binding for the Table TD element.
-     */
-    public function addTdClasses(array|string $classes): static
-    {
-        $this->tdClasses = array_unique(array_merge($this->tdClasses, (array) $classes));
-
-        return $this;
-    }
-
-    /**
-     * Set the array of Style attributes for Style binding for the Table TD element.
-     */
-    public function setTdStyles(array|string $classes): static
-    {
-        $this->tdStyles = (array) $classes;
-
-        return $this;
-    }
-
-    /**
-     * Extend the array of Style attributes for Style binding for the Table TD element.
-     */
-    public function addTdStyles(array|string $classes): static
-    {
-        $this->tdStyles = array_unique(array_merge($this->tdClasses, (array) $classes));
-
-        return $this;
+        return is_null($value) || (is_string($value) && Str::trim($value) == '') ? $this->resolveDefaultValue() : $value;
     }
 
     /**
@@ -169,15 +147,11 @@ abstract class AbstractColumn implements JsonSerializable
         return [
             'component' => $this->component($request),
             'value' => $this->resolveValue($request),
+            'mergedData' => $this->mergedData,
             'sortable' => $this->sortable ?? false,
             'asHtml' => $this->renderHtml ?? false,
             'attribute' => $this->attribute,
-            'bindings' => [
-                'td' => [
-                    'styles' => $this->tdStyles,
-                    'classes' => $this->tdClasses,
-                ],
-            ],
+            'bindings' => $this->bindings ?? null,
         ];
     }
 }

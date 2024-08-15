@@ -2,12 +2,13 @@
 
 namespace LaraCombs\Table\Elements;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use LaraCombs\Table\AbstractElement;
 use LaraCombs\Table\Traits\MakeableTrait;
 
 /**
- * @method static static make(string $label, string $url, ?string $attribute = null)
+ * @method static static make(string|callable $label, string|callable $url, ?string $attribute = null)
  */
 class ButtonVisit extends AbstractElement
 {
@@ -16,12 +17,16 @@ class ButtonVisit extends AbstractElement
     /**
      * Specifies where to open the linked document.
      */
-    protected ?string $target = null;
+    protected string $target = '_self';
 
     /**
      * Initialize a new Element class.
+     *
+     * @param  string|(callable(\Illuminate\Database\Eloquent\Model, \Illuminate\Http\Request):(string))  $label
+     * @param  string|(callable(\Illuminate\Database\Eloquent\Model, \Illuminate\Http\Request):(string))  $url
+     * @param  string|null  $attribute
      */
-    public function __construct(string $label, string $url, ?string $attribute = null)
+    public function __construct(string|callable $label, string|callable $url, ?string $attribute = null)
     {
         if (! $attribute) {
             $attribute = Str::kebab(class_basename(get_called_class()));
@@ -32,22 +37,25 @@ class ButtonVisit extends AbstractElement
             'url' => $url,
             'attribute' => $attribute,
             'target' => $this->target,
-            'binding' => [
-                'buttonClass' => [],
-            ],
         ];
     }
 
     /**
-     * Set the array of classes for Class binding for the button.
+     * Specify data that should be serialized to JSON for the colum.
      *
-     * @param array<string>|string $class
-     * @return static
+     * @return array<string, mixed>
      */
-    public function btnClass(array|string $class): static
+    public function jsonSerialize(): array
     {
-        $this->sharedData['binding']['buttonClass'] = (array) $class;
+        $request = app(Request::class);
 
-        return $this;
+        $callables = ['label', 'url'];
+        foreach ($callables as $callable) {
+            if (is_callable($this->sharedData[$callable])) {
+                $this->sharedData[$callable] = call_user_func($this->sharedData[$callable], $this->resource, $request);
+            }
+        }
+
+        return parent::jsonSerialize();
     }
 }
