@@ -359,7 +359,7 @@ abstract class AbstractTable implements JsonSerializable
         $actions = $this->resolveActions($request);
         $standaloneActions = $this->resolveStandaloneActions($request);
 
-        return array_merge($this->paginator($request)->toArray(), [
+        return [
             'key' => $this->uriKey,
             'headings' => $this->headings,
             'isSearchable' => ! empty($this->search($request)),
@@ -371,6 +371,7 @@ abstract class AbstractTable implements JsonSerializable
             'bindings' => $this->bindings,
             'orderColumn' => $this->orderColumn,
             'orderDirection' => $this->orderDirection,
-        ]);
+            'paginator' => $this->paginator($request),
+        ];
     }
 }
