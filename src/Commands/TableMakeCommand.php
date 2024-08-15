@@ -52,7 +52,7 @@ class TableMakeCommand extends AbstractGeneratorCommand
     {
         $name = $this->option('model');
 
-        if (! $name) {
+        if (! $name || ! is_string($name)) {
             return '// TODO: Implement model() method.';
         }
 
@@ -63,6 +63,8 @@ class TableMakeCommand extends AbstractGeneratorCommand
 
     /**
      * Get the console command options.
+     *
+     * @return array<int, array<int, int|string>>
      */
     protected function getOptions(): array
     {

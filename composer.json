@@ -7,7 +7,10 @@
         "illuminate/support": "^10.34|^11.0"
     },
     "require-dev": {
-        "larastan/larastan": "^2.9"
+        "phpstan/phpstan": "^1.11",
+        "larastan/larastan": "^2.9",
+        "orchestra/testbench": "^9.3",
+        "laravel/pint": "^1.17"
     },
     "extra": {
         "laravel": {

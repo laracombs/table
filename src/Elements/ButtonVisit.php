@@ -41,7 +41,7 @@ class ButtonVisit extends AbstractElement
     /**
      * Set the array of classes for Class binding for the button.
      *
-     * @param array<string>|string $class
+     * @param  array<string>|string  $class
      * @return static
      */
     public function btnClass(array|string $class): static

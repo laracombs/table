@@ -69,6 +69,8 @@ abstract class AbstractColumn implements JsonSerializable
     /**
      * Create a new column element.
      *
+     * @param  string  $name
+     * @param  string  $attribute
      * @param  (callable(mixed, mixed, ?string):(mixed))|null  $resolveAttributeCallback
      */
     public function __construct(string $name, string $attribute, ?callable $resolveAttributeCallback = null)
