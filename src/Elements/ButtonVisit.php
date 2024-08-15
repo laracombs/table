@@ -17,7 +17,7 @@ class ButtonVisit extends AbstractElement
     /**
      * Specifies where to open the linked document.
      */
-    protected ?string $target = null;
+    protected string $target = '_self';
 
     /**
      * Initialize a new Element class.

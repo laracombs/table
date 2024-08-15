@@ -45,6 +45,15 @@ abstract class AbstractTable implements JsonSerializable
     protected array $headings;
 
     /**
+     * The Class and Style Bindings.
+     *
+     * @var array<string, array<int, string>>
+     */
+    protected array $bindings = [
+        'classes' => ['table'],
+    ];
+
+    /**
      * The resource model for the given table.
      *
      * @return class-string<\Illuminate\Database\Eloquent\Model>
@@ -221,7 +230,12 @@ abstract class AbstractTable implements JsonSerializable
     protected function setHeadings(): void
     {
         $columns = $this->columns
-            ->mapWithKeys(fn (AbstractColumn $column) => [$column->attribute => $column->name])
+            ->map(fn (AbstractColumn $column) => [
+                'attribute' => $column->attribute,
+                'name' => $column->name,
+                'classes' => data_get($column->bindings, 'headingClasses', []),
+                'styles' => data_get($column->bindings, 'headingStyles', []),
+            ])
             ->toArray();
 
         $this->headings = $columns;
@@ -295,6 +309,7 @@ abstract class AbstractTable implements JsonSerializable
             'filters' => $this->resolveFilters($request),
             'hasActions' => count($actions) > 0 || count($standaloneActions) > 0,
             'debounce' => $this->debounce($request),
+            'bindings' => $this->bindings,
         ]);
     }
 }

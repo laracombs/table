@@ -45,6 +45,13 @@ abstract class AbstractColumn implements JsonSerializable
     public string $attribute;
 
     /**
+     * Optional merged data for more flexible columns
+     *
+     * @var mixed|array
+     */
+    protected mixed $mergedData = [];
+
+    /**
      * The callback to be used to resolve the field's value.
      *
      * @var (callable(mixed, mixed, ?string):(mixed))|null
@@ -63,6 +70,37 @@ abstract class AbstractColumn implements JsonSerializable
         $this->name = $name;
         $this->attribute = $attribute;
         $this->resolveAttributeCallback = $resolveAttributeCallback;
+
+        $this->bindings['headingClasses'] = [];
+        $this->bindings['headingStyles'] = [];
+    }
+
+
+
+    /**
+     * Add Class binding.
+     *
+     * @param  array<string>|string  $class
+     * @return static
+     */
+    public function headingClass(array|string $class): static
+    {
+        $this->bindings['headingClasses'] = array_unique(array_merge($this->bindings['headingClasses'], (array) $class));
+
+        return $this;
+    }
+
+    /**
+     * Add Style binding.
+     *
+     * @param  array<string>|string  $class
+     * @return static
+     */
+    public function headingStyle(array|string $class): static
+    {
+        $this->bindings['headingStyles'] = array_unique(array_merge($this->bindings['headingStyles'], (array) $class));
+
+        return $this;
     }
 
     /**
@@ -109,6 +147,7 @@ abstract class AbstractColumn implements JsonSerializable
         return [
             'component' => $this->component($request),
             'value' => $this->resolveValue($request),
+            'mergedData' => $this->mergedData,
             'sortable' => $this->sortable ?? false,
             'asHtml' => $this->renderHtml ?? false,
             'attribute' => $this->attribute,

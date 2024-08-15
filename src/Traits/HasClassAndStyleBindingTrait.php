@@ -9,7 +9,7 @@ trait HasClassAndStyleBindingTrait
      *
      * @var array<string, array<string, mixed>>
      */
-    protected array $bindings = [
+    public array $bindings = [
         'classes' => [],
         'styles' => [],
     ];
@@ -20,7 +20,7 @@ trait HasClassAndStyleBindingTrait
      * @param  array<string>|string  $class
      * @return static
      */
-    protected function class(array|string $class): static
+    public function class(array|string $class): static
     {
         $this->bindings['classes'] = array_unique(array_merge($this->bindings['classes'], (array) $class));
 
@@ -33,7 +33,7 @@ trait HasClassAndStyleBindingTrait
      * @param  array<string>|string  $class
      * @return static
      */
-    protected function style(array|string $class): static
+    public function style(array|string $class): static
     {
         $this->bindings['styles'] = array_unique(array_merge($this->bindings['styles'], (array) $class));
 
