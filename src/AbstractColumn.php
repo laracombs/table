@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use LaraCombs\Table\Traits\AuthorizationTrait;
+use LaraCombs\Table\Traits\HasClassAndStyleBindingTrait;
 use LaraCombs\Table\Traits\HasComponentTrait;
 use LaraCombs\Table\Traits\MakeableTrait;
 
@@ -14,6 +15,7 @@ use LaraCombs\Table\Traits\MakeableTrait;
 abstract class AbstractColumn implements JsonSerializable
 {
     use AuthorizationTrait;
+    use HasClassAndStyleBindingTrait;
     use HasComponentTrait;
     use Macroable;
     use MakeableTrait;
@@ -49,22 +51,6 @@ abstract class AbstractColumn implements JsonSerializable
      * @var (callable(mixed, mixed, ?string):(mixed))|null
      */
     public mixed $resolveAttributeCallback;
-
-    /**
-     * The array of classes for Class binding for the Table TD element.
-     *
-     * @todo Default not hardcoded.
-     *
-     * @var array<int, string>
-     */
-    public ?array $tdClasses = ['tc-table-td'];
-
-    /**
-     * The array of Style attributes for class binding for the Table TD element.
-     *
-     * @var array<int, string>
-     */
-    public ?array $tdStyles = [];
 
     /**
      * Create a new column element.
@@ -120,46 +106,6 @@ abstract class AbstractColumn implements JsonSerializable
     }
 
     /**
-     * Set the array of Classes for Class binding for the Table TD element.
-     */
-    public function setTdClasses(array|string $classes): static
-    {
-        $this->tdClasses = (array) $classes;
-
-        return $this;
-    }
-
-    /**
-     * Extend the array of Classes for Class binding for the Table TD element.
-     */
-    public function addTdClasses(array|string $classes): static
-    {
-        $this->tdClasses = array_unique(array_merge($this->tdClasses, (array) $classes));
-
-        return $this;
-    }
-
-    /**
-     * Set the array of Style attributes for Style binding for the Table TD element.
-     */
-    public function setTdStyles(array|string $classes): static
-    {
-        $this->tdStyles = (array) $classes;
-
-        return $this;
-    }
-
-    /**
-     * Extend the array of Style attributes for Style binding for the Table TD element.
-     */
-    public function addTdStyles(array|string $classes): static
-    {
-        $this->tdStyles = array_unique(array_merge($this->tdClasses, (array) $classes));
-
-        return $this;
-    }
-
-    /**
      * Specify data that should be serialized to JSON for the colum.
      *
      * @return array<string, mixed>
@@ -174,12 +120,7 @@ abstract class AbstractColumn implements JsonSerializable
             'sortable' => $this->sortable ?? false,
             'asHtml' => $this->renderHtml ?? false,
             'attribute' => $this->attribute,
-            'bindings' => [
-                'td' => [
-                    'styles' => $this->tdStyles,
-                    'classes' => $this->tdClasses,
-                ],
-            ],
+            'bindings' => $this->bindings ?? null,
         ];
     }
 }

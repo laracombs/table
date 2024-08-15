@@ -5,10 +5,12 @@ namespace LaraCombs\Table;
 use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
+use LaraCombs\Table\Traits\HasClassAndStyleBindingTrait;
 use LaraCombs\Table\Traits\HasComponentTrait;
 
 abstract class AbstractElement implements JsonSerializable
 {
+    use HasClassAndStyleBindingTrait;
     use HasComponentTrait;
     use Macroable;
 
@@ -19,6 +21,8 @@ abstract class AbstractElement implements JsonSerializable
 
     /**
      * The shared data for this Element.
+     *
+     * @var array<string, mixed>
      */
     protected array $sharedData = [];
 
@@ -34,6 +38,7 @@ abstract class AbstractElement implements JsonSerializable
         return [
             'component' => $this->component($request),
             'sharedData' => $this->sharedData,
+            'bindings' => $this->bindings ?? null,
         ];
     }
 }

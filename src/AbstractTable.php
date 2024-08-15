@@ -29,7 +29,7 @@ abstract class AbstractTable implements JsonSerializable
     /**
      * The Collection of authorized table columns.
      *
-     * @var \Illuminate\Support\Collection<\LaraCombs\Table\AbstractColumn>
+     * @var \Illuminate\Support\Collection<int, \LaraCombs\Table\AbstractColumn>
      */
     protected Collection $columns;
 
@@ -50,7 +50,7 @@ abstract class AbstractTable implements JsonSerializable
     /**
      * Get the table columns for the given resource.
      *
-     * @return array<\LaraCombs\Table\AbstractColumn>
+     * @return array<int, \LaraCombs\Table\AbstractColumn>
      */
     abstract public function columns(Request $request): array;
 
@@ -149,8 +149,10 @@ abstract class AbstractTable implements JsonSerializable
             });
         }
 
+        $perPage = $request->integer($this->uriKey . '_per_page');
+
         $instance = $instance->paginate(
-            $request->input($this->uriKey . '_per_page') ?? $this->perPageOptions($request)[0],
+            $perPage && $perPage > 0 ? $perPage : $this->perPageOptions($request)[0],
             ['*'],
             $this->uriKey . '_page'
         );

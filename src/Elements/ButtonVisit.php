@@ -32,22 +32,6 @@ class ButtonVisit extends AbstractElement
             'url' => $url,
             'attribute' => $attribute,
             'target' => $this->target,
-            'binding' => [
-                'buttonClass' => [],
-            ],
         ];
-    }
-
-    /**
-     * Set the array of classes for Class binding for the button.
-     *
-     * @param  array<string>|string  $class
-     * @return static
-     */
-    public function btnClass(array|string $class): static
-    {
-        $this->sharedData['binding']['buttonClass'] = (array) $class;
-
-        return $this;
     }
 }
