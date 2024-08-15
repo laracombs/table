@@ -4,6 +4,7 @@ namespace LaraCombs\Table;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use LaraCombs\Table\Traits\AuthorizationTrait;
@@ -102,7 +103,7 @@ abstract class AbstractColumn implements JsonSerializable
             call_user_func($this->resolveAttributeCallback, $this->resource, $request) :
             value(data_get($this->resource, $this->attribute));
 
-        return ! is_bool($value) && ! is_int($value) && empty($value) ? $this->resolveDefaultValue() : $value;
+        return is_null($value) || (is_string($value) && Str::trim($value) == '') ? $this->resolveDefaultValue() : $value;
     }
 
     /**
