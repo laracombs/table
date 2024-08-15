@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\AbstractPaginator;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
@@ -40,9 +39,9 @@ abstract class AbstractTable implements JsonSerializable
     /**
      * The array of table headings.
      *
-     * @var array<TKey, mixed>
+     * @var \Illuminate\Support\Collection<TKey, mixed>
      */
-    protected array $headings;
+    protected Collection $headings;
 
     /**
      * The Class and Style Bindings.
@@ -52,6 +51,20 @@ abstract class AbstractTable implements JsonSerializable
     protected array $bindings = [
         'classes' => ['table'],
     ];
+
+    /**
+     * The order column using to order by default.
+     *
+     * @var string|null
+     */
+    protected ?string $orderColumn = null;
+
+    /**
+     * The order direction using to order by default.
+     *
+     * @var string
+     */
+    protected string $orderDirection = 'desc';
 
     /**
      * The resource model for the given table.
@@ -83,9 +96,56 @@ abstract class AbstractTable implements JsonSerializable
      * @param  \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $query
      * @return \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>
      */
-    public static function query(Request $request, Builder $query): Builder
+    public function query(Request $request, Builder $query): Builder
     {
         return $query;
+    }
+
+    /**
+     * Build the order query for the given resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>  $query
+     * @return \Illuminate\Database\Eloquent\Builder<\Illuminate\Database\Eloquent\Model>
+     */
+    protected function orderQuery(Request $request, Builder $query): Builder
+    {
+        $this->orderColumn = $this->orderColumn($request);
+        $this->orderDirection = $this->orderDirection($request);
+
+        return $query->orderBy($this->orderColumn, $this->orderDirection);
+    }
+
+    /**
+     * Get the order column for the current Request.
+     *
+     * @param \Illuminate\Http\Request  $request
+     *
+     * @return string
+     */
+    protected function orderColumn(Request $request): string
+    {
+        $column = $request->input($this->uriKey . '_order', $this->orderColumn);
+
+        if ($column && in_array($column, $this->headings->pluck('attribute')->toArray())) {
+            return $column;
+        }
+
+        return $this->headings->first()['attribute'];
+    }
+
+    /**
+     * Get the order direction for the current Request.
+     *
+     * @param \Illuminate\Http\Request  $request
+     *
+     * @return string
+     */
+    protected function orderDirection(Request $request): string
+    {
+        $direction = $request->input($this->uriKey . '_direction', $this->orderDirection);
+
+        return in_array($direction, ['asc', 'desc']) ? $direction : 'desc';
     }
 
     /**
@@ -147,7 +207,7 @@ abstract class AbstractTable implements JsonSerializable
     /**
      * Get the paginator for the given table resources.
      */
-    protected function paginator(Request $request): LengthAwarePaginator
+    protected function paginator(Request $request): AbstractPaginator
     {
         $instance = $this->getResourcesInstance()
             ->where(fn (Builder $query) => $this->query($request, $query));
@@ -161,6 +221,8 @@ abstract class AbstractTable implements JsonSerializable
                 }
             });
         }
+
+        $instance = $this->orderQuery($request, $instance);
 
         $perPage = $request->integer($this->uriKey . '_per_page');
 
@@ -229,16 +291,13 @@ abstract class AbstractTable implements JsonSerializable
      */
     protected function setHeadings(): void
     {
-        $columns = $this->columns
+        $this->headings = $this->columns
             ->map(fn (AbstractColumn $column) => [
                 'attribute' => $column->attribute,
                 'name' => $column->name,
                 'classes' => data_get($column->bindings, 'headingClasses', []),
                 'styles' => data_get($column->bindings, 'headingStyles', []),
-            ])
-            ->toArray();
-
-        $this->headings = $columns;
+            ]);
     }
 
     /**
@@ -310,6 +369,8 @@ abstract class AbstractTable implements JsonSerializable
             'hasActions' => count($actions) > 0 || count($standaloneActions) > 0,
             'debounce' => $this->debounce($request),
             'bindings' => $this->bindings,
+            'orderColumn' => $this->orderColumn,
+            'orderDirection' => $this->orderDirection,
         ]);
     }
 }

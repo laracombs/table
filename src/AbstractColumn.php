@@ -85,7 +85,10 @@ abstract class AbstractColumn implements JsonSerializable
      */
     public function headingClass(array|string $class): static
     {
-        $this->bindings['headingClasses'] = array_unique(array_merge($this->bindings['headingClasses'], (array) $class));
+        $this->bindings['headingClasses'] = array_unique(array_merge(
+            $this->bindings['headingClasses'],
+            (array) $class
+        ));
 
         return $this;
     }
