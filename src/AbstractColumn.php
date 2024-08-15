@@ -2,7 +2,6 @@
 
 namespace LaraCombs\Table;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -10,6 +9,7 @@ use JsonSerializable;
 use LaraCombs\Table\Traits\AuthorizationTrait;
 use LaraCombs\Table\Traits\HasClassAndStyleBindingTrait;
 use LaraCombs\Table\Traits\HasComponentTrait;
+use LaraCombs\Table\Traits\HasResourceTrait;
 use LaraCombs\Table\Traits\MakeableTrait;
 
 /** @phpstan-consistent-constructor */
@@ -18,6 +18,7 @@ abstract class AbstractColumn implements JsonSerializable
     use AuthorizationTrait;
     use HasClassAndStyleBindingTrait;
     use HasComponentTrait;
+    use HasResourceTrait;
     use Macroable;
     use MakeableTrait;
 
@@ -27,12 +28,9 @@ abstract class AbstractColumn implements JsonSerializable
     protected string $type = 'Column';
 
     /**
-     * The resource associated with the column.
-     */
-    public Model $resource;
-
-    /**
      * The name displayed in heading of a table.
+     *
+     * @var string
      */
     public string $name;
 
@@ -65,13 +63,6 @@ abstract class AbstractColumn implements JsonSerializable
         $this->name = $name;
         $this->attribute = $attribute;
         $this->resolveAttributeCallback = $resolveAttributeCallback;
-    }
-
-    public function forResource(Model $resource): static
-    {
-        $this->resource = $resource;
-
-        return $this;
     }
 
     /**

@@ -5,13 +5,17 @@ namespace LaraCombs\Table;
 use Illuminate\Http\Request;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
+use LaraCombs\Table\Traits\AuthorizationTrait;
 use LaraCombs\Table\Traits\HasClassAndStyleBindingTrait;
 use LaraCombs\Table\Traits\HasComponentTrait;
+use LaraCombs\Table\Traits\HasResourceTrait;
 
 abstract class AbstractElement implements JsonSerializable
 {
+    use AuthorizationTrait;
     use HasClassAndStyleBindingTrait;
     use HasComponentTrait;
+    use HasResourceTrait;
     use Macroable;
 
     /**

@@ -71,9 +71,8 @@ class View extends AbstractColumn
     /**
      * Render Blade view as Markdown.
      *
-     * @param array<string, mixed>  $markdownOptions
-     * @param array<int, \League\CommonMark\Extension\ExtensionInterface>  $markdownExtensions
-     *
+     * @param  array<string, mixed>  $markdownOptions
+     * @param  array<int, \League\CommonMark\Extension\ExtensionInterface>  $markdownExtensions
      * @return static
      */
     public function asMarkdown(array $markdownOptions = [], array $markdownExtensions = []): static

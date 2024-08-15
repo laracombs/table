@@ -177,8 +177,7 @@ abstract class AbstractTable implements JsonSerializable
     /**
      * Run a map over each of the Model resources.
      *
-     * @param \Illuminate\Pagination\AbstractPaginator<\Illuminate\Support\Collection>  $resources
-     *
+     * @param  \Illuminate\Pagination\AbstractPaginator<\Illuminate\Support\Collection>  $resources
      * @return \Illuminate\Pagination\AbstractPaginator
      */
     protected function mapResourcesCollection(AbstractPaginator $resources): AbstractPaginator
@@ -192,8 +191,7 @@ abstract class AbstractTable implements JsonSerializable
     /**
      * Map Model resource with table columns.
      *
-     * @param \Illuminate\Database\Eloquent\Model  $resource
-     *
+     * @param  \Illuminate\Database\Eloquent\Model  $resource
      * @return array<int, array<string, mixed>>.
      */
     protected function mapModelResource(Model $resource): array
@@ -230,8 +228,7 @@ abstract class AbstractTable implements JsonSerializable
     }
 
     /**
-     * @param \Illuminate\Http\Request  $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return array<\LaraCombs\Table\AbstractAction>
      */
     protected function resolveActions(Request $request): array
@@ -241,8 +238,7 @@ abstract class AbstractTable implements JsonSerializable
     }
 
     /**
-     * @param \Illuminate\Http\Request  $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return array<\LaraCombs\Table\AbstractAction>
      */
     protected function resolveStandaloneActions(Request $request): array
@@ -252,8 +248,7 @@ abstract class AbstractTable implements JsonSerializable
     }
 
     /**
-     * @param \Illuminate\Http\Request  $request
-     *
+     * @param  \Illuminate\Http\Request  $request
      * @return array<\LaraCombs\Table\AbstractFilter>
      */
     protected function resolveFilters(Request $request): array

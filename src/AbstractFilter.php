@@ -2,7 +2,4 @@
 
 namespace LaraCombs\Table;
 
-abstract class AbstractFilter
-{
-
-}
+abstract class AbstractFilter {}
