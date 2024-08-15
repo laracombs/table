@@ -7,7 +7,7 @@ trait HasClassAndStyleBindingTrait
     /**
      * The Class and Style Bindings.
      *
-     * @var array|array[]
+     * @var array<string, array<string, mixed>>
      */
     protected array $bindings = [
         'classes' => [],
@@ -17,9 +17,8 @@ trait HasClassAndStyleBindingTrait
     /**
      * Add Class binding.
      *
-     * @param array|string  $class
-     *
-     * @return $this
+     * @param  array<string>|string  $class
+     * @return static
      */
     protected function class(array|string $class): static
     {
@@ -31,9 +30,8 @@ trait HasClassAndStyleBindingTrait
     /**
      * Add Style binding.
      *
-     * @param array|string  $class
-     *
-     * @return $this
+     * @param  array<string>|string  $class
+     * @return static
      */
     protected function style(array|string $class): static
     {

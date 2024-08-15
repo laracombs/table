@@ -2,6 +2,7 @@
 
 namespace LaraCombs\Table\Columns;
 
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use LaraCombs\Table\AbstractColumn;
@@ -24,21 +25,29 @@ class View extends AbstractColumn
 
     /**
      * The data for the Blade view that should be rendered for the column.
+     *
+     * @var \Illuminate\Contracts\Support\Arrayable<string, mixed>|array<string, mixed>
      */
-    protected array $viewData;
+    protected array|Arrayable $viewData;
 
     /**
      * The merge data for the Blade view that should be rendered for the column.
+     *
+     * @var array<string, mixed>
      */
     protected array $viewMergeData;
 
     /**
      * The GitHub Flavored Markdown options.
+     *
+     * @var array<string, mixed>
      */
     protected array $markdownOptions;
 
     /**
      * The GitHub Flavored Markdown extensions.
+     *
+     * @var array<int, \League\CommonMark\Extension\ExtensionInterface>
      */
     protected array $markdownExtensions;
 
@@ -61,6 +70,11 @@ class View extends AbstractColumn
 
     /**
      * Render Blade view as Markdown.
+     *
+     * @param array<string, mixed>  $markdownOptions
+     * @param array<int, \League\CommonMark\Extension\ExtensionInterface>  $markdownExtensions
+     *
+     * @return static
      */
     public function asMarkdown(array $markdownOptions = [], array $markdownExtensions = []): static
     {
@@ -74,9 +88,12 @@ class View extends AbstractColumn
     /**
      * Set the Blade view.
      *
+     * @param  string  $view
+     * @param  \Illuminate\Contracts\Support\Arrayable<string, mixed>|array<string, mixed>  $data
+     * @param  array<string, mixed>  $mergeData
      * @return $this
      */
-    public function view(string $view, array $data = [], array $mergeData = []): static
+    public function view(string $view, array|Arrayable $data = [], array $mergeData = []): static
     {
         $this->view = $view;
         $this->viewData = $data;
