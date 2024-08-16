@@ -31,6 +31,7 @@ class TablesServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->loadJsonTranslationsFrom(__DIR__ . '/../../lang');
+        $this->loadJsonTranslationsFrom(lang_path('vendor/laracombs-table'));
 
         $this->publishes([
             __DIR__ . '/../../config/laracombs-table.php' => config_path('laracombs-table.php'),

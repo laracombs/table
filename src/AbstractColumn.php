@@ -10,6 +10,7 @@ use LaraCombs\Table\Traits\AuthorizationTrait;
 use LaraCombs\Table\Traits\HasClassAndStyleBindingTrait;
 use LaraCombs\Table\Traits\HasComponentTrait;
 use LaraCombs\Table\Traits\HasResourceTrait;
+use LaraCombs\Table\Traits\IsSortableTrait;
 use LaraCombs\Table\Traits\MakeableTrait;
 
 /** @phpstan-consistent-constructor */
@@ -19,6 +20,7 @@ abstract class AbstractColumn implements JsonSerializable
     use HasClassAndStyleBindingTrait;
     use HasComponentTrait;
     use HasResourceTrait;
+    use IsSortableTrait;
     use Macroable;
     use MakeableTrait;
 
@@ -75,7 +77,17 @@ abstract class AbstractColumn implements JsonSerializable
         $this->bindings['headingStyles'] = [];
     }
 
+    /**
+     * Set the column as sortable or not.
+     *
+     * @return $this
+     */
+    public function sortable(bool $value = true): static
+    {
+        $this->sortable = $value;
 
+        return $this;
+    }
 
     /**
      * Add Class binding.

@@ -8,7 +8,6 @@ use Illuminate\Support\Str;
 use LaraCombs\Table\AbstractColumn;
 use LaraCombs\Table\Exceptions\ColumnException;
 use LaraCombs\Table\Traits\HtmlRenderableTrait;
-use LaraCombs\Table\Traits\IsSortableTrait;
 
 /**
  * @method static static make(string $name, string $attribute, ?callable $resolveAttributeCallback = null)
@@ -16,7 +15,6 @@ use LaraCombs\Table\Traits\IsSortableTrait;
 class View extends AbstractColumn
 {
     use HtmlRenderableTrait;
-    use IsSortableTrait;
 
     /**
      * The Blade view that should be rendered for the column.

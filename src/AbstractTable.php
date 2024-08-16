@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
+use LaraCombs\Table\Support\TranslationData;
 
 /**
  * @template TKey of array-key
@@ -297,6 +298,7 @@ abstract class AbstractTable implements JsonSerializable
                 'name' => $column->name,
                 'classes' => data_get($column->bindings, 'headingClasses', []),
                 'styles' => data_get($column->bindings, 'headingStyles', []),
+                'sortable' => $column->sortable,
             ]);
     }
 
@@ -360,6 +362,7 @@ abstract class AbstractTable implements JsonSerializable
         $standaloneActions = $this->resolveStandaloneActions($request);
 
         return [
+            'paginator' => $this->paginator($request),
             'key' => $this->uriKey,
             'headings' => $this->headings,
             'isSearchable' => ! empty($this->search($request)),
@@ -371,7 +374,10 @@ abstract class AbstractTable implements JsonSerializable
             'bindings' => $this->bindings,
             'orderColumn' => $this->orderColumn,
             'orderDirection' => $this->orderDirection,
-            'paginator' => $this->paginator($request),
+            'translations' => (new TranslationData())(),
+            'search' => $request->input($this->uriKey . '_search'),
+            'queryParams' => $request->query(),
+            'searchValue' => (string) $request->input($this->uriKey . '_search'),
         ];
     }
 }
