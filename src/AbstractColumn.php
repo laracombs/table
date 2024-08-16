@@ -59,6 +59,11 @@ abstract class AbstractColumn implements JsonSerializable
     public mixed $resolveAttributeCallback;
 
     /**
+     * Determine if the column is sortable.
+     */
+    public bool $sortable = true;
+
+    /**
      * Create a new column element.
      *
      * @param  string  $name
@@ -75,7 +80,17 @@ abstract class AbstractColumn implements JsonSerializable
         $this->bindings['headingStyles'] = [];
     }
 
+    /**
+     * Set the column as sortable or not.
+     *
+     * @return $this
+     */
+    public function sortable(bool $value = true): static
+    {
+        $this->sortable = $value;
 
+        return $this;
+    }
 
     /**
      * Add Class binding.
@@ -85,7 +100,10 @@ abstract class AbstractColumn implements JsonSerializable
      */
     public function headingClass(array|string $class): static
     {
-        $this->bindings['headingClasses'] = array_unique(array_merge($this->bindings['headingClasses'], (array) $class));
+        $this->bindings['headingClasses'] = array_unique(array_merge(
+            $this->bindings['headingClasses'],
+            (array) $class
+        ));
 
         return $this;
     }

@@ -1,1 +1,8 @@
-{}
+{
+    "Actions": "Aktionen",
+    "Ascending": "Aufsteigend",
+    "Descending": "Absteigend",
+    "Filters": "Filters",
+    "Order by „:name“": "Nach „:name“ sortieren",
+    "Search": "Suchen"
+}

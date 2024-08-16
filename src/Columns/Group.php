@@ -12,6 +12,11 @@ use LaraCombs\Table\AbstractElement;
 class Group extends AbstractColumn
 {
     /**
+     * Determine if the column is sortable.
+     */
+    public bool $sortable = false;
+
+    /**
      * The array of items.
      *
      * @var array<\LaraCombs\Table\AbstractElement>
