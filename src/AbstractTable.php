@@ -128,7 +128,10 @@ abstract class AbstractTable implements JsonSerializable
     {
         $column = $request->input($this->uriKey . '_order', $this->orderColumn);
 
-        if ($column && in_array($column, $this->headings->pluck('attribute')->toArray())) {
+        if (
+            $column && in_array($column, $this->headings->pluck('attribute')->toArray()) &&
+            data_get($this->headings->firstWhere('attribute', $column), 'sortable')
+        ) {
             return $column;
         }
 
