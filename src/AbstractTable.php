@@ -6,24 +6,19 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\AbstractPaginator;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use LaraCombs\Table\Support\TranslationData;
+use LaraCombs\Table\Traits\HasUriKeyTrait;
 
 /**
  * @template TKey of array-key
  */
 abstract class AbstractTable implements JsonSerializable
 {
+    use HasUriKeyTrait;
     use Macroable;
-
-    /**
-     * The URI key for the given table.
-     */
-    protected ?string $uriKey = null;
 
     /**
      * The debounce amount to use when searching in this table.
@@ -38,9 +33,49 @@ abstract class AbstractTable implements JsonSerializable
     protected Collection $columns;
 
     /**
+     * The Collection of authorized table filters.
+     *
+     * @var \Illuminate\Support\Collection<int, \LaraCombs\Table\AbstractFilter>
+     */
+    protected Collection $filters;
+
+    /**
+     * The array of active filters.
+     *
+     * @var string[]
+     */
+    protected array $activeFilters = [];
+
+    /**
+     * The array of active filters cases.
+     * @var array<int, array>
+     */
+    protected array $activeFilterCases = [];
+
+    /**
+     * The array of active filters values.
+     * @var array<int, array>
+     */
+    protected array $activeFilterValues = [];
+
+    /**
+     * The Collection of authorized table actions.
+     *
+     * @var \Illuminate\Support\Collection<int, \LaraCombs\Table\AbstractAction>
+     */
+    protected Collection $actions;
+
+    /**
+     * The Collection of authorized table standalone actions.
+     *
+     * @var \Illuminate\Support\Collection<int, \LaraCombs\Table\AbstractAction>
+     */
+    protected Collection $standaloneActions;
+
+    /**
      * The array of table headings.
      *
-     * @var \Illuminate\Support\Collection<TKey, mixed>
+     * @var \Illuminate\Support\Collection<TKey, string>
      */
     protected Collection $headings;
 
@@ -193,22 +228,6 @@ abstract class AbstractTable implements JsonSerializable
     }
 
     /**
-     * Set the URI key for the given table.
-     */
-    protected function setUriKey(Request $request): void
-    {
-        $this->uriKey = empty($this->uriKey) ? $this->uriKeyFallback($request) : trim(Str::lower($this->uriKey));
-    }
-
-    /**
-     * Return a default URI key as fallback for this table.
-     */
-    protected function uriKeyFallback(Request $request): string
-    {
-        return Str::snake(class_basename(get_called_class()));
-    }
-
-    /**
      * Get the paginator for the given table resources.
      */
     protected function paginator(Request $request): AbstractPaginator
@@ -280,20 +299,18 @@ abstract class AbstractTable implements JsonSerializable
     }
 
     /**
-     * Determine the array of authorized table columns.
+     * Resolve the Collection of authorized table columns.
      */
-    protected function setColumns(Request $request): void
+    protected function resolveColumns(Request $request): void
     {
-        $this->columns = collect(Arr::where(
-            $this->columns($request),
-            fn (AbstractColumn $column) => $column->authorize($request)
-        ));
+        $this->columns = collect($this->columns($request))
+            ->reject(fn (AbstractColumn $column) => ! $column->authorize($request));
     }
 
     /**
-     * Set the array of table headings.
+     * Resolve the Collection of table headings.
      */
-    protected function setHeadings(): void
+    protected function resolveHeadings(): void
     {
         $this->headings = $this->columns
             ->map(fn (AbstractColumn $column) => [
@@ -307,32 +324,34 @@ abstract class AbstractTable implements JsonSerializable
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @return array<\LaraCombs\Table\AbstractAction>
      */
-    protected function resolveActions(Request $request): array
+    protected function resolveActions(Request $request): void
     {
         // @Todo: implement
-        return [];
+        $this->actions = collect();
     }
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @return array<\LaraCombs\Table\AbstractAction>
      */
-    protected function resolveStandaloneActions(Request $request): array
+    protected function resolveStandaloneActions(Request $request): void
     {
         // @Todo: implement
-        return [];
+        $this->standaloneActions = collect();
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
-     * @return array<\LaraCombs\Table\AbstractFilter>
+     * Resolve the Collection of authorized table filters.
      */
-    protected function resolveFilters(Request $request): array
+    protected function resolveFilters(Request $request): void
     {
-        // @Todo: implement
-        return [];
+        $this->filters = collect($this->filters($request))
+            ->reject(fn (AbstractFilter $filter) => ! $filter->authorize($request))
+            ->mapWithKeys(function (AbstractFilter $filter) {
+                $filter = $filter->jsonSerialize();
+
+                return [$filter['key'] => $filter];
+            });
     }
 
     /**
@@ -357,22 +376,25 @@ abstract class AbstractTable implements JsonSerializable
     public function jsonSerialize(): array
     {
         $request = app(Request::class);
-        $this->setUriKey($request);
-        $this->setColumns($request);
-        $this->setHeadings();
-
-        $actions = $this->resolveActions($request);
-        $standaloneActions = $this->resolveStandaloneActions($request);
+        $this->resolveUriKey($request);
+        $this->resolveColumns($request);
+        $this->resolveHeadings();
+        $this->resolveFilters($request);
+        $this->resolveActions($request);
+        $this->resolveStandaloneActions($request);
 
         return [
-            'paginator' => $this->paginator($request),
             'key' => $this->uriKey,
+            'paginator' => $this->paginator($request),
             'headings' => $this->headings,
             'isSearchable' => ! empty($this->search($request)),
-            'actions' => $actions,
-            'standaloneActions' => $standaloneActions,
-            'filters' => $this->resolveFilters($request),
-            'hasActions' => count($actions) > 0 || count($standaloneActions) > 0,
+            'actions' => $this->actions,
+            'standaloneActions' => $this->standaloneActions,
+            'filters' => $this->filters,
+            'activeFilters' => $this->activeFilters,
+            'activeFilterCases' => $this->activeFilterCases,
+            'activeFilterValues' => $this->activeFilterValues,
+            'hasActions' => $this->actions->isNotEmpty() || $this->standaloneActions->isNotEmpty(),
             'debounce' => $this->debounce($request),
             'bindings' => $this->bindings,
             'orderColumn' => $this->orderColumn,

@@ -9,10 +9,18 @@ class TranslationData
         return [
             'Actions' => __('Actions'),
             'Ascending' => __('Ascending'),
+            'Contains' => __('Contains'),
             'Descending' => __('Descending'),
+            'Does not Ends with' => __('Does not Ends with'),
+            'Does not contains' => __('Does not contains'),
+            'Does not equals' => __('Does not equals'),
+            'Does not starts with' => __('Does not starts with'),
+            'Ends with' => __('Ends with'),
+            'Equals' => __('Equals'),
             'Filters' => __('Filters'),
             'Order by „:name“' => __('Order by „:name“'),
             'Search' => __('Search'),
+            'Starts with' => __('Starts with'),
         ];
     }
 }
