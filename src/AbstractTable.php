@@ -267,6 +267,15 @@ abstract class AbstractTable implements JsonSerializable
     {
         $filters = json_decode(base64_decode($filters), true);
 
+        foreach ($filters as $key => $value) {
+            if (! $this->filters->has($key)) {
+                continue;
+            }
+            $this->activeFilters[] = $key;
+            $this->activeFilterCases[$key] = $value['case'];
+            $this->activeFilterValues[$key] = $value['value'];
+        }
+
         if (empty($filters)) {
             return $query;
         }
