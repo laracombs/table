@@ -19,10 +19,12 @@ class TranslationData
             'Ends with' => __('Ends with'),
             'Equals' => __('Equals'),
             'Filters' => __('Filters'),
+            'No' => __('No'),
             'Order by „:name“' => __('Order by „:name“'),
             'Remove' => __('Remove'),
             'Search' => __('Search'),
             'Starts with' => __('Starts with'),
+            'Yes' => __('Yes'),
         ];
     }
 }
