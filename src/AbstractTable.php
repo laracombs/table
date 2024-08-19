@@ -272,7 +272,7 @@ abstract class AbstractTable implements JsonSerializable
                 continue;
             }
             $this->activeFilters[] = $key;
-            $this->activeFilterCases[$key] = $value['case'];
+            $this->activeFilterCases[$key] = data_get($value, 'case');
             $this->activeFilterValues[$key] = $value['value'];
         }
 
@@ -289,7 +289,7 @@ abstract class AbstractTable implements JsonSerializable
                     return $filter->apply(
                         request: $request,
                         query: $query,
-                        case: $filters[$filter->uriKey]['case'],
+                        case: data_get($filters, $filter->uriKey . '.case'),
                         value: $filters[$filter->uriKey]['value']
                     );
                 });
