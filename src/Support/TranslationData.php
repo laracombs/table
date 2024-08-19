@@ -8,6 +8,7 @@ class TranslationData
     {
         return [
             'Actions' => __('Actions'),
+            'Apply' => __('Apply'),
             'Ascending' => __('Ascending'),
             'Contains' => __('Contains'),
             'Descending' => __('Descending'),
@@ -19,6 +20,7 @@ class TranslationData
             'Equals' => __('Equals'),
             'Filters' => __('Filters'),
             'Order by „:name“' => __('Order by „:name“'),
+            'Remove' => __('Remove'),
             'Search' => __('Search'),
             'Starts with' => __('Starts with'),
         ];

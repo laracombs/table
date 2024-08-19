@@ -1,5 +1,6 @@
 {
     "Actions": "Aktionen",
+    "Apply": "Anwenden",
     "Ascending": "Aufsteigend",
     "Contains": "Enthält",
     "Descending": "Absteigend",
@@ -11,6 +12,7 @@
     "Equals": "Ist gleich",
     "Filters": "Filters",
     "Order by „:name“": "Nach „:name“ sortieren",
+    "Remove": "Entfernen",
     "Search": "Suchen",
     "Starts with": "Beginnt mit"
 }

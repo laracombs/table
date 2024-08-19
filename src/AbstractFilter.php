@@ -40,18 +40,6 @@ abstract class AbstractFilter implements JsonSerializable
     protected string $type = 'Filter';
 
     /**
-     * The requested value for this filter.
-     *
-     * @var mixed|null
-     */
-    protected mixed $value = null;
-
-    /**
-     * The requested case for this filter.
-     */
-    protected mixed $case = null;
-
-    /**
      * Create a new filter element.
      *
      * @param string  $label
@@ -76,10 +64,12 @@ abstract class AbstractFilter implements JsonSerializable
      *
      * @param \Illuminate\Http\Request               $request
      * @param \Illuminate\Database\Eloquent\Builder  $query
+     * @param mixed                                  $case
+     * @param mixed                                  $value
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    abstract public function apply(Request $request, Builder $query): Builder;
+    abstract public function apply(Request $request, Builder $query, mixed $case, mixed $value): Builder;
 
     /**
      * @param \Illuminate\Database\Eloquent\Builder  $query

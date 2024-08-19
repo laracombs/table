@@ -1,5 +1,6 @@
 {
     "Actions": "Actions",
+    "Apply": "Apply",
     "Ascending": "Ascending",
     "Contains": "Contains",
     "Descending": "Descending",
@@ -11,6 +12,7 @@
     "Equals": "Equals",
     "Filters": "Filters",
     "Order by „:name“": "Order by „:name“",
+    "Remove": "Remove",
     "Search": "Search",
     "Starts with": "Starts with"
 }
