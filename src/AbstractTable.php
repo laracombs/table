@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
@@ -35,7 +36,7 @@ abstract class AbstractTable implements JsonSerializable
     /**
      * The Collection of authorized table filters.
      *
-     * @var \Illuminate\Support\Collection<int, \LaraCombs\Table\AbstractFilter>
+     * @var \Illuminate\Support\Collection<string, array>
      */
     protected Collection $filters;
 
@@ -245,6 +246,10 @@ abstract class AbstractTable implements JsonSerializable
             });
         }
 
+        if ($filters = $request->input($this->uriKey . '_filters')) {
+            $this->applyFilters($request, $instance, $filters);
+        }
+
         $instance = $this->orderQuery($request, $instance);
 
         $perPage = $request->integer($this->uriKey . '_per_page');
@@ -256,6 +261,30 @@ abstract class AbstractTable implements JsonSerializable
         );
 
         return $this->mapResourcesCollection($instance);
+    }
+
+    protected function applyFilters(Request $request, Builder $query, string $filters)
+    {
+        $filters = json_decode(base64_decode($filters), true);
+
+        if (empty($filters)) {
+            return $query;
+        }
+
+        return $query->where(function (Builder $query) use ($filters, $request) {
+            $this->filters
+                ->reject(fn (array $filter, string $key) => ! in_array($key, array_keys($filters)))
+                ->each(function ($filter) use (&$query, $request, $filters) {
+                    /* @var \LaraCombs\Table\AbstractFilter $filter */
+                    $filter = $filter['resource'];
+                    return $filter->apply(
+                        request: $request,
+                        query: $query,
+                        case: $filters[$filter->uriKey]['case'],
+                        value: $filters[$filter->uriKey]['value']
+                    );
+                });
+        });
     }
 
     /**
@@ -348,9 +377,10 @@ abstract class AbstractTable implements JsonSerializable
         $this->filters = collect($this->filters($request))
             ->reject(fn (AbstractFilter $filter) => ! $filter->authorize($request))
             ->mapWithKeys(function (AbstractFilter $filter) {
-                $filter = $filter->jsonSerialize();
+                $data = $filter->jsonSerialize();
+                $data['resource'] = $filter;
 
-                return [$filter['key'] => $filter];
+                return [$data['key'] => $data];
             });
     }
 
@@ -390,7 +420,7 @@ abstract class AbstractTable implements JsonSerializable
             'isSearchable' => ! empty($this->search($request)),
             'actions' => $this->actions,
             'standaloneActions' => $this->standaloneActions,
-            'filters' => $this->filters,
+            'filters' => $this->filters->map(fn (array $filter) => Arr::except($filter, 'resource')),
             'activeFilters' => $this->activeFilters,
             'activeFilterCases' => $this->activeFilterCases,
             'activeFilterValues' => $this->activeFilterValues,

@@ -38,45 +38,47 @@ class TextFilter extends AbstractFilter
      *
      * @param \Illuminate\Http\Request               $request
      * @param \Illuminate\Database\Eloquent\Builder  $query
+     * @param mixed                                  $case
+     * @param mixed                                  $value
      *
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function apply(Request $request, Builder $query): Builder
+    public function apply(Request $request, Builder $query, mixed $case, mixed $value): Builder
     {
-        $case = TextFilterEnum::tryFrom($this->case);
+        $case = TextFilterEnum::tryFrom($case);
 
         return match ($case) {
             TextFilterEnum::CONTAINS => $query->where(
                 $this->attribute,
                 $this->likeOperator($query),
-                '%' . $this->value . '%'
+                '%' . $value . '%'
             ),
             TextFilterEnum::NOT_CONTAINS => $query->where(
                 $this->attribute,
                 'NOT ' . $this->likeOperator($query),
-                '%' . $this->value . '%'
+                '%' . $value . '%'
             ),
-            TextFilterEnum::EQUALS => $query->where($this->attribute, $this->value),
-            TextFilterEnum::NOT_EQUALS => $query->where($this->attribute, '!=', $this->value),
+            TextFilterEnum::EQUALS => $query->where($this->attribute, $value),
+            TextFilterEnum::NOT_EQUALS => $query->where($this->attribute, '!=', $value),
             TextFilterEnum::STARTS_WITH => $query->where(
                 $this->attribute,
                 $this->likeOperator($query),
-                '%' . $this->value
+                '%' . $value
             ),
             TextFilterEnum::ENDS_WITH => $query->where(
                 $this->attribute,
                 $this->likeOperator($query),
-                $this->value . '%'
+                $value . '%'
             ),
             TextFilterEnum::NOT_STARTS_WITH => $query->where(
                 $this->attribute,
                 'NOT ' . $this->likeOperator($query),
-                '%' . $this->value
+                '%' . $value
             ),
             TextFilterEnum::NOT_ENDS_WITH => $query->where(
                 $this->attribute,
                 'NOT ' . $this->likeOperator($query),
-                $this->value . '%'
+                $value . '%'
             ),
             default => throw new FilterException(sprintf('Invalid case for %s.', __CLASS__))
         };
