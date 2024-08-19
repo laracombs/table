@@ -108,9 +108,7 @@ class View extends AbstractColumn
     protected function resolveValue(Request $request): string
     {
         if (empty($this->view)) {
-            throw new ColumnException(
-                sprintf('View not defined for %s.', $this->attribute)
-            );
+            throw new ColumnException(sprintf('View not defined for %s.', $this->attribute));
         }
 
         $rendered = view($this->view, $this->viewData, $this->viewMergeData)->render();

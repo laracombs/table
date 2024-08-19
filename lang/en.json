@@ -1,8 +1,16 @@
 {
     "Actions": "Actions",
     "Ascending": "Ascending",
+    "Contains": "Contains",
     "Descending": "Descending",
+    "Does not Ends with": "Does not Ends with",
+    "Does not contains": "Does not contains",
+    "Does not equals": "Does not equals",
+    "Does not starts with": "Does not starts with",
+    "Ends with": "Ends with",
+    "Equals": "Equals",
     "Filters": "Filters",
     "Order by „:name“": "Order by „:name“",
-    "Search": "Search"
+    "Search": "Search",
+    "Starts with": "Starts with"
 }

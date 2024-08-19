@@ -150,7 +150,8 @@ abstract class AbstractColumn implements JsonSerializable
             call_user_func($this->resolveAttributeCallback, $this->resource, $request) :
             value(data_get($this->resource, $this->attribute));
 
-        return is_null($value) || (is_string($value) && Str::trim($value) == '') ? $this->resolveDefaultValue() : $value;
+        return is_null($value) || (is_string($value) && Str::trim($value) == '') ?
+            $this->resolveDefaultValue() : $value;
     }
 
     /**
