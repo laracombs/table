@@ -20,6 +20,7 @@ class TranslationData
             'Equals' => __('Equals'),
             'Filters' => __('Filters'),
             'No' => __('No'),
+            'No resources were found.' => __('No resources were found.'),
             'Order by „:name“' => __('Order by „:name“'),
             'Remove' => __('Remove'),
             'Search' => __('Search'),
