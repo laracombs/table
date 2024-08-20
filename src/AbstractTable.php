@@ -184,7 +184,10 @@ abstract class AbstractTable implements JsonSerializable
             return $column;
         }
 
-        return $this->headings->first()['attribute'];
+        /* @var \Illuminate\Database\Eloquent\Model $instance */
+        $instance = app($this->model());
+
+        return $instance->getKeyName();
     }
 
     /**
