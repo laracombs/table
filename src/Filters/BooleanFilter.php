@@ -4,9 +4,11 @@ namespace LaraCombs\Table\Filters;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Illuminate\Support\Arr;
 use LaraCombs\Table\AbstractFilter;
 
+/**
+ * @method static static make(string $label, string $attribute)
+ */
 class BooleanFilter extends AbstractFilter
 {
     /**
