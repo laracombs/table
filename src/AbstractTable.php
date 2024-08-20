@@ -12,14 +12,17 @@ use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use LaraCombs\Table\Support\TranslationData;
 use LaraCombs\Table\Traits\HasUriKeyTrait;
+use LaraCombs\Table\Traits\MakeableTrait;
 
 /**
  * @template TKey of array-key
+ * @method static static make(?string $uriKey = null)
  */
 abstract class AbstractTable implements JsonSerializable
 {
     use HasUriKeyTrait;
     use Macroable;
+    use MakeableTrait;
 
     /**
      * The debounce amount to use when searching in this table.
@@ -102,6 +105,16 @@ abstract class AbstractTable implements JsonSerializable
      * @var string
      */
     protected string $orderDirection = 'desc';
+
+    /**
+     * Create a new Table instance.
+     *
+     * @param string|null  $uriKey
+     */
+    public function __construct(?string $uriKey = null)
+    {
+        $this->uriKey = $uriKey;
+    }
 
     /**
      * The resource model for the given table.
