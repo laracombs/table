@@ -10,6 +10,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
+use LaraCombs\Table\Events\TableCreated;
+use LaraCombs\Table\Events\TableSerialize;
 use LaraCombs\Table\Support\TranslationData;
 use LaraCombs\Table\Traits\HasUriKeyTrait;
 use LaraCombs\Table\Traits\MakeableTrait;
@@ -114,6 +116,7 @@ abstract class AbstractTable implements JsonSerializable
     public function __construct(?string $uriKey = null)
     {
         $this->uriKey = $uriKey;
+        $this->dispatchTableCreated();
     }
 
     /**
@@ -438,7 +441,7 @@ abstract class AbstractTable implements JsonSerializable
         $this->resolveActions($request);
         $this->resolveStandaloneActions($request);
 
-        return [
+        $data = [
             'key' => $this->uriKey,
             'paginator' => $this->paginator($request),
             'headings' => $this->headings,
@@ -459,5 +462,29 @@ abstract class AbstractTable implements JsonSerializable
             'queryParams' => $request->query(),
             'searchValue' => (string) $request->input($this->uriKey . '_search'),
         ];
+
+        $this->dispatchTableSerialize();
+
+        return $data;
+    }
+
+    /**
+     * Dispatch the TableCreated event
+     *
+     * @return void
+     */
+    protected function dispatchTableCreated(): void
+    {
+        TableCreated::dispatch($this);
+    }
+
+    /**
+     * Dispatch the TableSerialize event
+     *
+     * @return void
+     */
+    protected function dispatchTableSerialize(): void
+    {
+        TableSerialize::dispatch($this);
     }
 }
