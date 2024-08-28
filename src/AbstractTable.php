@@ -214,7 +214,7 @@ abstract class AbstractTable implements JsonSerializable
      */
     public function perPageOptions(Request $request): array
     {
-        return [20, 50, 100];
+        return config('laracombs-table.per_page', [20, 50, 100]);
     }
 
     /**
@@ -271,15 +271,31 @@ abstract class AbstractTable implements JsonSerializable
 
         $instance = $this->orderQuery($request, $instance);
 
-        $perPage = $request->integer($this->uriKey . '_per_page');
-
         $instance = $instance->paginate(
-            $perPage && $perPage > 0 ? $perPage : $this->perPageOptions($request)[0],
+            $this->currentPerPage($request),
             ['*'],
             $this->uriKey . '_page'
-        );
+        )->withQueryString();
 
         return $this->mapResourcesCollection($instance);
+    }
+
+    /**
+     * Get the default per page option.
+     */
+    protected function defaultPerPage(Request $request): int
+    {
+        return $this->perPageOptions($request)[0];
+    }
+
+    /**
+     * Get the current per page option.
+     */
+    protected function currentPerPage(Request $request): int
+    {
+        $perPage = $request->integer($this->uriKey . '_per_page');
+
+        return $perPage && $perPage > 0 ? $perPage : $this->perPageOptions($request)[0];
     }
 
     protected function applyFilters(Request $request, Builder $query, string $filters)
@@ -427,48 +443,6 @@ abstract class AbstractTable implements JsonSerializable
     }
 
     /**
-     * Specify data that should be serialized to JSON for the table.
-     *
-     * @return array<string, mixed>
-     */
-    public function jsonSerialize(): array
-    {
-        $request = app(Request::class);
-        $this->resolveUriKey($request);
-        $this->resolveColumns($request);
-        $this->resolveHeadings();
-        $this->resolveFilters($request);
-        $this->resolveActions($request);
-        $this->resolveStandaloneActions($request);
-
-        $data = [
-            'key' => $this->uriKey,
-            'paginator' => $this->paginator($request),
-            'headings' => $this->headings,
-            'isSearchable' => ! empty($this->search($request)),
-            'actions' => $this->actions,
-            'standaloneActions' => $this->standaloneActions,
-            'filters' => $this->filters->map(fn (array $filter) => Arr::except($filter, 'resource')),
-            'activeFilters' => $this->activeFilters,
-            'activeFilterCases' => $this->activeFilterCases,
-            'activeFilterValues' => $this->activeFilterValues,
-            'hasActions' => $this->actions->isNotEmpty() || $this->standaloneActions->isNotEmpty(),
-            'debounce' => $this->debounce($request),
-            'bindings' => $this->bindings,
-            'orderColumn' => $this->orderColumn,
-            'orderDirection' => $this->orderDirection,
-            'translations' => (new TranslationData())(),
-            'search' => $request->input($this->uriKey . '_search'),
-            'queryParams' => $request->query(),
-            'searchValue' => (string) $request->input($this->uriKey . '_search'),
-        ];
-
-        $this->dispatchTableSerialize();
-
-        return $data;
-    }
-
-    /**
      * Dispatch the TableCreated event
      *
      * @return void
@@ -486,5 +460,51 @@ abstract class AbstractTable implements JsonSerializable
     protected function dispatchTableSerialize(): void
     {
         TableSerialize::dispatch($this);
+    }
+
+    /**
+     * Specify data that should be serialized to JSON for the table.
+     *
+     * @return array<string, mixed>
+     */
+    public function jsonSerialize(): array
+    {
+        $request = app(Request::class);
+        $this->resolveUriKey($request);
+        $this->resolveColumns($request);
+        $this->resolveHeadings();
+        $this->resolveFilters($request);
+        $this->resolveActions($request);
+        $this->resolveStandaloneActions($request);
+        $paginator = $this->paginator($request);
+
+        $data = [
+            'classes' => config('laracombs-table.classes'),
+            'key' => $this->uriKey,
+            'paginator' => $paginator,
+            'headings' => $this->headings,
+            'isSearchable' => ! empty($this->search($request)),
+            'actions' => $this->actions,
+            'standaloneActions' => $this->standaloneActions,
+            'filters' => $this->filters->map(fn (array $filter) => Arr::except($filter, 'resource')),
+            'activeFilters' => $this->activeFilters,
+            'activeFilterCases' => $this->activeFilterCases,
+            'activeFilterValues' => $this->activeFilterValues,
+            'hasActions' => $this->actions->isNotEmpty() || $this->standaloneActions->isNotEmpty(),
+            'debounce' => $this->debounce($request),
+            'bindings' => $this->bindings,
+            'orderColumn' => $this->orderColumn,
+            'orderDirection' => $this->orderDirection,
+            'translations' => (new TranslationData())(),
+            'search' => $request->input($this->uriKey . '_search'),
+            'queryParams' => $request->query(),
+            'searchValue' => (string) $request->input($this->uriKey . '_search'),
+            'perPage' => $this->currentPerPage($request),
+            'perPageOptions' => $this->perPageOptions($request),
+        ];
+
+        $this->dispatchTableSerialize();
+
+        return $data;
     }
 }

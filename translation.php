@@ -19,25 +19,25 @@ file_put_contents(
     json_encode($items, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
 );
 
-$class = '<?php
-
-namespace LaraCombs\Table\Support;
-
-class TranslationData
-{
-    public function __invoke(): array
-    {
-        return [
-';
-
-foreach ($items as $item) {
-    $class .= '            ';
-    $class .= "'$item' => __('$item'),\n";
-}
-
-$class .= '        ];
-    }
-}
-';
-
-file_put_contents(__DIR__ . '/src/Support/TranslationData.php', $class);
+//$class = '<?php
+//
+//namespace LaraCombs\Table\Support;
+//
+//class TranslationData
+//{
+//    public function __invoke(): array
+//    {
+//        return [
+//';
+//
+//foreach ($items as $item) {
+//    $class .= '            ';
+//    $class .= "'$item',\n";
+//}
+//
+//$class .= '        ];
+//    }
+//}
+//';
+//
+//file_put_contents(__DIR__ . '/src/Support/TranslationData.php', $class);
