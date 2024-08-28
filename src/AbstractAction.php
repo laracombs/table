@@ -69,6 +69,14 @@ abstract class AbstractAction implements JsonSerializable
     }
 
     /**
+     * Specify additional data that should be serialized to JSON for the colum.
+     */
+    protected function sharedData(Request $request): array
+    {
+        return [];
+    }
+
+    /**
      * Specify data that should be serialized to JSON for the colum.
      *
      * @return array<string, mixed>
@@ -77,9 +85,9 @@ abstract class AbstractAction implements JsonSerializable
     {
         $request = app(Request::class);
 
-        return [
-            'component' => $this->component($request),
-            'dependentOnRow' => $this->resolveDependentOnRow($request),
-        ];
+        return array_merge([
+                'component' => $this->component($request),
+                'dependentOnRow' => $this->resolveDependentOnRow($request),
+            ], $this->sharedData($request));
     }
 }

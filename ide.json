@@ -12,6 +12,18 @@
                     "parameters": [1]
                 }
             ]
+        },
+        {
+            "complete": "routeName",
+            "condition": [
+                {
+                    "methodNames": ["get", "head", "put", "post", "patch", "delete"],
+                    "classFqn": [
+                        "\\LaraCombs\\Table\\Actions\\ActionButton"
+                    ],
+                    "parameters": [1]
+                }
+            ]
         }
     ]
 }
