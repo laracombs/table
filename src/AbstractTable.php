@@ -12,6 +12,7 @@ use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use LaraCombs\Table\Events\TableCreated;
 use LaraCombs\Table\Events\TableSerialize;
+use LaraCombs\Table\Support\ActionCollection;
 use LaraCombs\Table\Support\TranslationData;
 use LaraCombs\Table\Traits\HasUriKeyTrait;
 use LaraCombs\Table\Traits\MakeableTrait;
@@ -228,16 +229,6 @@ abstract class AbstractTable implements JsonSerializable
     }
 
     /**
-     * Get all available standalone actions for this table.
-     *
-     * @return array<\LaraCombs\Table\AbstractAction>
-     */
-    public function standaloneActions(Request $request): array
-    {
-        return [];
-    }
-
-    /**
      * Get all available filters for this table.
      *
      * @return array<\LaraCombs\Table\AbstractAction>
@@ -363,12 +354,27 @@ abstract class AbstractTable implements JsonSerializable
      */
     protected function mapModelResource(Model $resource): array
     {
-        $data = [];
+        $data = [$this->indexColumn($resource)];
         $this->columns->each(function (AbstractColumn $column) use (&$data, $resource) {
             $data[] = $column->forResource($resource)->jsonSerialize();
         });
 
         return $data;
+    }
+
+    /**
+     * Get the index column for a Model resource.
+     *
+     * @param \Illuminate\Database\Eloquent\Model  $resource
+     *
+     * @return array
+     */
+    protected function indexColumn(Model $resource): array
+    {
+        return [
+            'component' => null,
+            'key' => $resource->getKey(),
+        ];
     }
 
     /**
@@ -396,21 +402,21 @@ abstract class AbstractTable implements JsonSerializable
     }
 
     /**
-     * @param  \Illuminate\Http\Request  $request
+     * Resolve the Collection of table actions.
      */
     protected function resolveActions(Request $request): void
     {
         // @Todo: implement
-        $this->actions = collect();
-    }
+        $this->actions = new ActionCollection();
+        $this->standaloneActions = new ActionCollection();
 
-    /**
-     * @param  \Illuminate\Http\Request  $request
-     */
-    protected function resolveStandaloneActions(Request $request): void
-    {
-        // @Todo: implement
-        $this->standaloneActions = collect();
+        foreach ($this->actions($request) as $action) {
+            if (! $action->authorize($request)) {
+                continue;
+            }
+
+            $action->isStandalone($request) ? $this->standaloneActions->push($action) : $this->actions->push($action);
+        }
     }
 
     /**
@@ -475,7 +481,6 @@ abstract class AbstractTable implements JsonSerializable
         $this->resolveHeadings();
         $this->resolveFilters($request);
         $this->resolveActions($request);
-        $this->resolveStandaloneActions($request);
         $paginator = $this->paginator($request);
 
         $data = [
@@ -490,7 +495,7 @@ abstract class AbstractTable implements JsonSerializable
             'activeFilters' => $this->activeFilters,
             'activeFilterCases' => $this->activeFilterCases,
             'activeFilterValues' => $this->activeFilterValues,
-            'hasActions' => $this->actions->isNotEmpty() || $this->standaloneActions->isNotEmpty(),
+            'actionable' => $this->actions->isNotEmpty() || $this->standaloneActions->isNotEmpty(),
             'debounce' => $this->debounce($request),
             'bindings' => $this->bindings,
             'orderColumn' => $this->orderColumn,

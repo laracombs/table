@@ -21,6 +21,9 @@ trait HasComponentTrait
         return $this->component ?: $this->defaultComponent($request);
     }
 
+    /**
+     * Get the default frontend component.
+     */
     protected function defaultComponent(Request $request): string
     {
         $component = 'LaracombsTable' . class_basename(get_called_class());
