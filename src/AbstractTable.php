@@ -12,7 +12,6 @@ use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use LaraCombs\Table\Events\TableCreated;
 use LaraCombs\Table\Events\TableSerialize;
-use LaraCombs\Table\Support\ActionCollection;
 use LaraCombs\Table\Support\TranslationData;
 use LaraCombs\Table\Traits\HasUriKeyTrait;
 use LaraCombs\Table\Traits\MakeableTrait;
@@ -406,9 +405,8 @@ abstract class AbstractTable implements JsonSerializable
      */
     protected function resolveActions(Request $request): void
     {
-        // @Todo: implement
-        $this->actions = new ActionCollection();
-        $this->standaloneActions = new ActionCollection();
+        $this->actions = collect();
+        $this->standaloneActions = collect();
 
         foreach ($this->actions($request) as $action) {
             if (! $action->authorize($request)) {

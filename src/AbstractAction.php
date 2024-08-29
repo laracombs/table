@@ -88,6 +88,7 @@ abstract class AbstractAction implements JsonSerializable
         return array_merge([
                 'component' => $this->component($request),
                 'dependentOnRow' => $this->resolveDependentOnRow($request),
+                'label' => $this->label,
             ], $this->sharedData($request));
     }
 }

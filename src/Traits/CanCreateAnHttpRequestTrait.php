@@ -3,14 +3,15 @@
 namespace LaraCombs\Table\Traits;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use LaraCombs\Table\Exceptions\MissingHttpRequestsArgumentsException;
 
 trait CanCreateAnHttpRequestTrait
 {
     /**
-     * The route for this element.
+     * The url for this element.
      */
-    protected string $route;
+    protected string $url;
 
     /**
      * The method for this element.
@@ -25,10 +26,10 @@ trait CanCreateAnHttpRequestTrait
     /**
      * This element create and send an HTTP request.
      */
-    public function request(string $method, string $route, string $queryKey = 'ids'): static
+    public function request(string $method, string $url, string $queryKey = 'ids'): static
     {
         $this->method = $method;
-        $this->route = $route;
+        $this->url = $url;
         $this->queryKey = $queryKey;
 
         return $this;
@@ -37,49 +38,49 @@ trait CanCreateAnHttpRequestTrait
     /**
      * This element create and send an HTTP GET request.
      */
-    public function get(string $route, string $queryKey = 'ids'): static
+    public function get(string $url, string $queryKey = 'ids'): static
     {
-        return $this->request('GET', $route, $queryKey);
+        return $this->request('GET', $url, $queryKey);
     }
 
     /**
      * This element create and send an HTTP HEAD request.
      */
-    public function head(string $route, string $queryKey = 'ids'): static
+    public function head(string $url, string $queryKey = 'ids'): static
     {
-        return $this->request('HEAD', $route, $queryKey);
+        return $this->request('HEAD', $url, $queryKey);
     }
 
     /**
      * This element create and send an HTTP PUT request.
      */
-    public function put(string $route, string $queryKey = 'ids'): static
+    public function put(string $url, string $queryKey = 'ids'): static
     {
-        return $this->request('PUT', $route, $queryKey);
+        return $this->request('PUT', $url, $queryKey);
     }
 
     /**
      * This element create and send an HTTP POST request.
      */
-    public function post(string $route, string $queryKey = 'ids'): static
+    public function post(string $url, string $queryKey = 'ids'): static
     {
-        return $this->request('POST', $route, $queryKey);
+        return $this->request('POST', $url, $queryKey);
     }
 
     /**
      * This element create and send an HTTP PATCH request.
      */
-    public function patch(string $route, string $queryKey = 'ids'): static
+    public function patch(string $url, string $queryKey = 'ids'): static
     {
-        return $this->request('PATCH', $route, $queryKey);
+        return $this->request('PATCH', $url, $queryKey);
     }
 
     /**
      * This element create and send an HTTP DELETE request.
      */
-    public function delete(string $route, string $queryKey = 'ids'): static
+    public function delete(string $url, string $queryKey = 'ids'): static
     {
-        return $this->request('DELETE', $route, $queryKey);
+        return $this->request('DELETE', $url, $queryKey);
     }
 
     /**
@@ -87,13 +88,13 @@ trait CanCreateAnHttpRequestTrait
      */
     protected function sharedData(Request $request): array
     {
-        if (empty($this->route) || empty($this->queryKey)) {
-            throw new MissingHttpRequestsArgumentsException('Missing route or query key for HTTP request.');
+        if (empty($this->url) || empty($this->queryKey)) {
+            throw new MissingHttpRequestsArgumentsException('Missing url or query key for HTTP request.');
         }
 
         return [
-            'route' => route($this->route),
-            'method' => $this->method,
+            'url' => $this->url,
+            'method' => Str::lower($this->method),
             'queryKey' => $this->queryKey,
         ];
     }
