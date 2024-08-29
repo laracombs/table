@@ -51,9 +51,7 @@ class BooleanFilter extends AbstractFilter
      */
     public function apply(Request $request, Builder $query, mixed $case, mixed $value): Builder
     {
-        $value == 't' ? $this->trueValue = true : $this->falseValue = true;
-
-        return $query->where($this->attribute, $value);
+        return $query->where($this->attribute, $value == 'y');
     }
 
 
