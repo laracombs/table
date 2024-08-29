@@ -8,6 +8,7 @@ use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use LaraCombs\Table\Traits\AuthorizationTrait;
 use LaraCombs\Table\Traits\HasComponentTrait;
+use LaraCombs\Table\Traits\HasSharedDataTrait;
 use LaraCombs\Table\Traits\HasUriKeyTrait;
 use LaraCombs\Table\Traits\MakeableTrait;
 
@@ -19,6 +20,7 @@ abstract class AbstractFilter implements JsonSerializable
     use HasUriKeyTrait {
         uriKeyFallback as protected uriKeyFallbackFromTrait;
     }
+    use HasSharedDataTrait;
     use Macroable;
     use MakeableTrait;
 
@@ -105,10 +107,10 @@ abstract class AbstractFilter implements JsonSerializable
         $request = app(Request::class);
         $this->resolveUriKey($request);
 
-        return [
+        return array_merge([
             'key' => $this->uriKey,
             'component' => $this->component($request),
             'label' => $this->label,
-        ];
+        ], $this->sharedData($request));
     }
 }

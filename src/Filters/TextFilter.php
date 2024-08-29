@@ -99,17 +99,15 @@ class TextFilter extends AbstractFilter
     }
 
     /**
-     * Specify data that should be serialized to JSON for the filter.
-     *
-     * @return array<string, mixed>
+     * Specify additional data that should be serialized to JSON for the colum.
      */
-    public function jsonSerialize(): array
+    protected function sharedData(Request $request): array
     {
-        return array_merge(parent::jsonSerialize(), [
+        return [
             'options' => Arr::mapWithKeys(
                 $this->options,
                 fn(TextFilterEnum $case) => [$case->value => $case->label()]
             ),
-        ]);
+        ];
     }
 }

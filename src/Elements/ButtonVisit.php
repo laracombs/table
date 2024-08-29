@@ -41,14 +41,10 @@ class ButtonVisit extends AbstractElement
     }
 
     /**
-     * Specify data that should be serialized to JSON for the colum.
-     *
-     * @return array<string, mixed>
+     * Specify additional data that should be serialized to JSON for the colum.
      */
-    public function jsonSerialize(): array
+    protected function sharedData(Request $request): array
     {
-        $request = app(Request::class);
-
         $callables = ['label', 'url'];
         foreach ($callables as $callable) {
             if (is_callable($this->sharedData[$callable])) {
@@ -56,6 +52,6 @@ class ButtonVisit extends AbstractElement
             }
         }
 
-        return parent::jsonSerialize();
+        return ['sharedData' => $this->sharedData];
     }
 }

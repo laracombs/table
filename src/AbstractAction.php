@@ -7,12 +7,14 @@ use Illuminate\Support\Traits\Macroable;
 use JsonSerializable;
 use LaraCombs\Table\Traits\AuthorizationTrait;
 use LaraCombs\Table\Traits\HasComponentTrait;
+use LaraCombs\Table\Traits\HasSharedDataTrait;
 use LaraCombs\Table\Traits\MakeableTrait;
 
 abstract class AbstractAction implements JsonSerializable
 {
     use AuthorizationTrait;
     use Macroable;
+    use HasSharedDataTrait;
     use HasComponentTrait;
     use MakeableTrait;
 
@@ -66,14 +68,6 @@ abstract class AbstractAction implements JsonSerializable
     public function isStandalone(Request $request): bool
     {
         return $this->standalone;
-    }
-
-    /**
-     * Specify additional data that should be serialized to JSON for the colum.
-     */
-    protected function sharedData(Request $request): array
-    {
-        return [];
     }
 
     /**
