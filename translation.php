@@ -5,18 +5,23 @@
  */
 
 $items = json_decode(file_get_contents(__DIR__ . '/lang/de.json'), true);
-ksort($items);
+ksort($items, SORT_STRING | SORT_FLAG_CASE);
 
 file_put_contents(
     __DIR__ . '/lang/de.json',
     json_encode($items, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
 );
 
-$items = array_combine(array_keys($items), array_keys($items));
+
+$en = json_decode(file_get_contents(__DIR__ . '/lang/en.json'), true);
+$enItems = [];
+foreach ($items as $key => $value) {
+    $enItems[$key] = ! empty($en[$key]) ? $en[$key] : $key;
+}
 
 file_put_contents(
     __DIR__ . '/lang/en.json',
-    json_encode($items, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+    json_encode($enItems, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
 );
 
 //$class = '<?php

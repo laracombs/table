@@ -58,14 +58,4 @@ class {{ class }} extends AbstractTable
     {
         return [];
     }
-
-    /**
-     * Get all available standalone actions for this table.
-     *
-     * @return array<\LaraCombs\Table\AbstractAction>
-     */
-    public function standaloneActions(Request $request): array
-    {
-        return [];
-    }
 }
