@@ -9,6 +9,7 @@ use LaraCombs\Table\Traits\AuthorizationTrait;
 use LaraCombs\Table\Traits\HasClassAndStyleBindingTrait;
 use LaraCombs\Table\Traits\HasComponentTrait;
 use LaraCombs\Table\Traits\HasResourceTrait;
+use LaraCombs\Table\Traits\HasSharedDataTrait;
 
 abstract class AbstractElement implements JsonSerializable
 {
@@ -16,6 +17,7 @@ abstract class AbstractElement implements JsonSerializable
     use HasClassAndStyleBindingTrait;
     use HasComponentTrait;
     use HasResourceTrait;
+    use HasSharedDataTrait;
     use Macroable;
 
     /**
@@ -39,10 +41,10 @@ abstract class AbstractElement implements JsonSerializable
     {
         $request = app(Request::class);
 
-        return [
+        return array_merge([
             'component' => $this->component($request),
-            'sharedData' => $this->sharedData,
             'bindings' => $this->bindings ?? null,
-        ];
+        ], $this->sharedData($request));
+
     }
 }

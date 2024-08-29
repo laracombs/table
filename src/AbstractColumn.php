@@ -10,6 +10,7 @@ use LaraCombs\Table\Traits\AuthorizationTrait;
 use LaraCombs\Table\Traits\HasClassAndStyleBindingTrait;
 use LaraCombs\Table\Traits\HasComponentTrait;
 use LaraCombs\Table\Traits\HasResourceTrait;
+use LaraCombs\Table\Traits\HasSharedDataTrait;
 use LaraCombs\Table\Traits\MakeableTrait;
 
 /** @phpstan-consistent-constructor */
@@ -19,6 +20,7 @@ abstract class AbstractColumn implements JsonSerializable
     use HasClassAndStyleBindingTrait;
     use HasComponentTrait;
     use HasResourceTrait;
+    use HasSharedDataTrait;
     use Macroable;
     use MakeableTrait;
 
@@ -163,7 +165,7 @@ abstract class AbstractColumn implements JsonSerializable
     {
         $request = app(Request::class);
 
-        return [
+        return array_merge([
             'component' => $this->component($request),
             'value' => $this->resolveValue($request),
             'mergedData' => $this->mergedData,
@@ -171,6 +173,6 @@ abstract class AbstractColumn implements JsonSerializable
             'asHtml' => $this->renderHtml ?? false,
             'attribute' => $this->attribute,
             'bindings' => $this->bindings ?? null,
-        ];
+        ], $this->sharedData($request));
     }
 }

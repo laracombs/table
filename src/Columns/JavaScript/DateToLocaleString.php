@@ -34,16 +34,12 @@ class DateToLocaleString extends AbstractColumn
     }
 
     /**
-     * Specify data that should be serialized to JSON for the colum.
-     *
-     * @return array<string, mixed>
+     * Specify additional data that should be serialized to JSON for the colum.
      */
-    public function jsonSerialize(): array
+    protected function sharedData(Request $request): array
     {
-        $request = app(Request::class);
-
-        return array_merge(parent::jsonSerialize(), [
+        return [
             'locale' => $this->resolveLocale($request),
-        ]);
+        ];
     }
 }
