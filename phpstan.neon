@@ -1,36 +1,17 @@
 includes:
   - vendor/larastan/larastan/extension.neon
+
 parameters:
-#  pro:
-#    dnsServers!:
-#      - '8.8.8.8'
+  pro:
+    dnsServers:
+      - '8.8.8.8'
   paths:
     - src/
 #  reportUnmatchedIgnoredErrors: false
 
-# 0 is the loosest and 9 is the strictest
   level: 9
 
   ignoreErrors:
-    - "#Unsafe usage of new static#"
-#      message: "#Unsafe usage of new static#"
-#      paths:
-#        - app/Support
-# Laravel Framework Rules https://github.com/laravel/framework/blob/11.x/phpstan.src.neon.dist
-#    - "#\\(void\\) is used#"
-#    - "#Access to an undefined property#"
-#    - "#Call to an undefined method#"
-#    - "#but return statement is missing.#"
-#    - "#Caught class [a-zA-Z0-9\\\\_]+ not found.#"
-#    - "#Class [a-zA-Z0-9\\\\_]+ not found.#"
-#    - "#has invalid type#"
-#    - "#should always throw an exception or terminate script execution#"
-#    - "#Instantiated class [a-zA-Z0-9\\\\_]+ not found.#"
-#
-#    ignoreErrors:
-#        - '#PHPDoc tag @var#'
-#
-#    excludePaths:
-#        - ./*/*/FileToBeExcluded.php
-#
-#    checkMissingIterableValueType: false
+    -
+      message: "#Unsafe usage of new static#"
+      path: src/Traits/MakeableTrait.php

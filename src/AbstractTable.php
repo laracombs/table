@@ -17,7 +17,6 @@ use LaraCombs\Table\Traits\HasUriKeyTrait;
 use LaraCombs\Table\Traits\MakeableTrait;
 
 /**
- * @template TKey of array-key
  * @method static static make(?string $uriKey = null)
  */
 abstract class AbstractTable implements JsonSerializable
@@ -81,7 +80,7 @@ abstract class AbstractTable implements JsonSerializable
     /**
      * The array of table headings.
      *
-     * @var \Illuminate\Support\Collection<TKey, string>
+     * @var \Illuminate\Support\Collection<array-key, string>
      */
     protected Collection $headings;
 
